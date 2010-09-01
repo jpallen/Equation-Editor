@@ -64,7 +64,7 @@ var ExpressionView = Class.create({
 	
 	_formatSymbol: function(symbol) {
 	  var formattedExpression = this._blankFormattedExpression();
-	  formattedExpression.tex = '\\cssId{' + symbol.uniqueId + '}{' + symbol.symbol + '}';
+	  formattedExpression.tex = '\\cssId{' + symbol.uniqueId + '}{' + symbol.symbol;
 	  formattedExpression.draggables.push({
 		  id: symbol.uniqueId,
 		  draggable: { 
@@ -81,6 +81,8 @@ var ExpressionView = Class.create({
 		formattedExpression.tex += '_{' + subScriptFE.tex + '}'
 		formattedExpression.draggables = formattedExpression.draggables.concat(subScriptFE.draggables);
 		formattedExpression.droppables = formattedExpression.droppables.concat(subScriptFE.droppables);
+		
+		formattedExpression.tex += '}'
 		
 	  return formattedExpression;
 	},
