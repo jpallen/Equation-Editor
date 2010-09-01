@@ -1,6 +1,6 @@
 var ExpressionList = Class.create(ExpressionPart, {
 	initialize: function($super, entries) {
-	  this.entries = entries;
+	  this.entries = entries || [];
 	  this.entries.each((function(entry) {
 		  entry.parent = this;
 		}).bind(this));
@@ -14,6 +14,7 @@ var ExpressionList = Class.create(ExpressionPart, {
 	},
 	
 	addEntry: function(entry, position) {
-	  this.entries.splice(position, 0, entry);	
+	  this.entries.splice(position, 0, entry);
+	  entry.parent = this;	
 	}
 });

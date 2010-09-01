@@ -71,6 +71,17 @@ var ExpressionView = Class.create({
 			  object: symbol
 		  }
 		});
+		
+		var superScriptFE = this._formatExpressionPart(symbol.superScript);
+		formattedExpression.tex += '^{' + superScriptFE.tex + '}'
+		formattedExpression.draggables = formattedExpression.draggables.concat(superScriptFE.draggables);
+		formattedExpression.droppables = formattedExpression.droppables.concat(superScriptFE.droppables);
+		
+		var subScriptFE = this._formatExpressionPart(symbol.subScript);
+		formattedExpression.tex += '_{' + subScriptFE.tex + '}'
+		formattedExpression.draggables = formattedExpression.draggables.concat(subScriptFE.draggables);
+		formattedExpression.droppables = formattedExpression.droppables.concat(subScriptFE.droppables);
+		
 	  return formattedExpression;
 	},
 	
@@ -86,7 +97,6 @@ var ExpressionView = Class.create({
 	},
 	
 	_initializeDraggables: function(draggables) {
-		console.log(draggables);
 	  draggables.each((function(options) {
   	  this.currentDraggables.push(
 	      new Draggable(options.id, {
@@ -116,6 +126,7 @@ var ExpressionView = Class.create({
 			    )
 			  }).bind(this)
 	    });
+	    $(options.id).addClassName('droppable');
 		}).bind(this));
 	}
 });

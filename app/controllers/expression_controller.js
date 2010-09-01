@@ -35,6 +35,7 @@ var BasicLogic = Class.create({
 	onDrop: function(event, droppedObject, receivingObject) {
 	  if (receivingObject.object instanceof ExpressionList) {
 		  /* move dropped expression into new position in expression list */
+			console.log(droppedObject.object);
 			
 		  var position = receivingObject.position;
 		  var droppedObject = droppedObject.object;

@@ -1,7 +1,17 @@
+body {
+  font-size: 24px;	
+}
+
 .typeset div {
   display: inline;
 }
 
+.droppable {
+  color: white;
+}
+
 .droppable_hover {
-  background-color: red;	
+  background-color: #def;
+  color: #def;
+  border: 1px dashed gray;
 }
