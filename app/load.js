@@ -3,6 +3,7 @@ function include(jsFile) {
 }
 
 include('app/controllers/expression_controller');
+include('app/models/expression_part');
 include('app/models/expression_list');
 include('app/models/symbol');
 include('app/views/expression_view');

@@ -5,7 +5,18 @@ ExpressionController
 --------------------
 - Receives all user input events e.g. clicking on symbols, beginning to drag symbols, dropping symbols, etc
   - Provides a framework for passing events down a callback chain to let plugins register special actions
-- Returns tex to be drawn the expression - can/should this be in the view?
+  - The controller will wrap the following callbacks from scriptaculous and pass them down the event chain, with modified arguements:
+    - onDrop - a draggable is dropped on a droppable
+      - arguments: event, draggable, droppable
+    - onHover - a draggable is hovered over a droppable
+      - arguments: event, draggable, droppable
+    - onDragStart - when a draggable is picked up
+      - arguments: event, draggable
+    - onDrag - called repeatedly as a draggable object is moved
+      - arguments: event, draggable
+    - onDragEnd - called when a drag is ended - not implemented since same use case as OnDrop?
+      - arguments: event, draggable
+Each controller will have an events chain which is an array of instances of classes descended from Logic. Each will be tried in turn and if it responds to the callback then it will be executed. If it returns true the termination will be stopped. Any other value and the chain will continue to be executed.
 
 LineController
 --------------

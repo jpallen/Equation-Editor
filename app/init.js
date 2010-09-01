@@ -5,6 +5,12 @@ function getUniqueId() {
   return String(uniqueId);	
 }
 
+var idToObjectDictionary = {};
+
+var mainEventChain = [
+  new BasicLogic()
+]
+
 var view = new ExpressionView();
 var controller = new ExpressionController();
 view.setController(controller);

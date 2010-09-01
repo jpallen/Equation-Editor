@@ -106,7 +106,16 @@ var ExpressionView = Class.create({
 	_initializeDroppables: function(droppables) {
 	  droppables.each((function(options) {
   	  this.currentDroppableKeys.push(options.id)
-	    Droppables.add(options.id, {hoverclass: 'droppable_hover'});
+	    Droppables.add(options.id, {
+		    hoverclass: 'droppable_hover',
+		    onDrop: (function(draggableElement, droppableElement, event) {
+			    this.controller.onDrop(
+				    event,
+				    { object: idToObjectDictionary[draggableElement.id] }, 
+				    options.droppable
+			    )
+			  }).bind(this)
+	    });
 		}).bind(this));
 	}
 });

@@ -1,6 +1,6 @@
-var Symbol = Class.create({
-  initialize: function(symbol) {
+var Symbol = Class.create(ExpressionPart, {
+  initialize: function($super, symbol) {
 	  this.symbol = symbol;
-	  this.uniqueId = getUniqueId();
+	  $super();
   }
 });
