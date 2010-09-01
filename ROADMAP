@@ -1,0 +1,61 @@
+Controllers
+===========
+
+ExpressionController
+--------------------
+- Receives all user input events e.g. clicking on symbols, beginning to drag symbols, dropping symbols, etc
+  - Provides a framework for passing events down a callback chain to let plugins register special actions
+- Returns tex to be drawn the expression - can/should this be in the view?
+
+LineController
+--------------
+- References an ExpressionController for the expression on that line
+- Also provides callbacks for taking a new line, etc
+
+SelectedExpressionController
+----------------------------
+- Receives click events from the selected expression
+- Responsible for reporting on the content of the selection so the view can be drawn properly
+
+ModifiedExpressionController
+----------------------------
+- Responsible for the expression that may be manipulated to replace the selection.
+
+Views
+=====
+
+ExpressionView
+--------------
+- Bound to an ExpressionController and responsible for drawing the expression with JsMath
+
+LineView
+--------
+- Draws a line with an expression and adds buttons for new lines etc
+
+SelectionView + others?
+-----------------------
+- Draws the selected expression along with the UI to manipulate it. Will reference SelectedExpressionController and ModifiedExpressionController.
+
+Models
+------
+
+ExpressionList, Fraction, Symbol
+--------------------------------
+- Used to build up a tree-like representation of an expression. 
+- Symbols have 'tags' denoting their properties. These are assigned so that logic plugins know which symbols to act on. Tags can be set globally (e.g. 'addition' on all symbols with the symbol '+', '-', '±', etc), or on a per-instance basis (e.g. 'matrix' on one instance of 'M'). Plugins will also need to be able to define custom properties on symbols, change their rendering, etc
+
+Plugins
+-------
+- Callback chains will be used wherever possible to let plugins hook in logic. Possible plugins:
+  - Exponentiation dragging - dragging the b out of exp(a + b) will give exp(a)exp(b)
+  - Associativity - dragging c out of a(b + c + d) gives a(b + d) + ac
+  - Tensors
+  - Integration measures
+  - Numerical simplification and prefactor extraction
+
+
+
+
+
+
+ 

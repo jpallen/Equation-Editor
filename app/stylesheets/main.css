@@ -1,0 +1,7 @@
+.typeset div {
+  display: inline;
+}
+
+.droppable_hover {
+  background-color: red;	
+}
