@@ -1,5 +1,6 @@
 var ExpressionView = Class.create({
 	initialize: function() {
+		this.renders = expressionViewRenders
 		this.container = new Element('div');
 		this.currentDraggables = [];
 		this.currentDroppableKeys = [];
@@ -11,84 +12,68 @@ var ExpressionView = Class.create({
 	
 	/* Re-renders the expression using JsMath */
 	render: function() {
-		var expression = this._formatExpressionPart(this.controller.expression);
+		this.draggablesToRender = [];
+		this.droppablesToRender = [];
 		
-		this.container.innerHTML = expression.tex;
+		this.container.innerHTML = this.expressionPartToTex(this.controller.expression);
 		this.container.addClassName('math');
 		this._removeDraggables();
 		this._removeDroppables();
 		jsMath.ProcessElement(this.container);
-		jsMath.Synchronize(this._initializeDraggables.bind(this, expression.draggables));
-		jsMath.Synchronize(this._initializeDroppables.bind(this, expression.droppables));
+		jsMath.Synchronize(this._initializeDraggables.bind(this));
+		jsMath.Synchronize(this._initializeDroppables.bind(this));
 	},
 	
-	_formatExpressionPart: function(expressionPart) {
+	expressionPartToTex: function(expressionPart) {
 		if (expressionPart instanceof ExpressionList) {
-			return this._formatExpressionList(expressionPart)
+			return this.expressionListToTex(expressionPart)
 		} else if (expressionPart instanceof Symbol) {
-			return this._formatSymbol(expressionPart)
+			return this.symbolToTex(expressionPart)
 		}
 		throw('unknown part of expression');
 	},
 	
-	_formatExpressionList: function(expressionList) {
-	  var formattedExpression = this._blankFormattedExpression();
+	expressionListToTex: function(expressionList) {
+	  var tex = '';
 	
 	  var counter = -1; // becomes 0 before first use	
-	  function addNextDroppableTo(formattedExpression) {
+	  function addNextDroppableTo(view) {
 		  counter += 1;
-		  droppableId = expressionList.uniqueId + '_droppable_' + counter;
-		  formattedExpression.droppables.push({
+		  droppableId = expressionList.uniqueId + '_space_' + counter;
+		  view.droppablesToRender.push({
 			  id: droppableId,
 			  droppable: {
 				  object: expressionList,
 				  position: counter
 				}
 			});
-			formattedExpression.tex += '\\cssId{' + droppableId + '}{.}';
+			return '\\cssId{' + droppableId + '}{.}';
 		}
 	
 	  expressionList.entries.each((function(expressionPart) {
-		  var formattedExpressionPart = this._formatExpressionPart(expressionPart);
-		  addNextDroppableTo(formattedExpression);
-		  formattedExpression.tex += formattedExpressionPart.tex;
-		
-		  formattedExpression.draggables = formattedExpression.draggables.concat(formattedExpressionPart.draggables);
-		  formattedExpression.droppables = formattedExpression.droppables.concat(formattedExpressionPart.droppables);
+		  tex += addNextDroppableTo(this);
+	    tex += this.expressionPartToTex(expressionPart);
 		}).bind(this));
+	  tex += addNextDroppableTo(this);
 		
-	  addNextDroppableTo(formattedExpression);
-		
-		return formattedExpression;
+		return tex;
 	},
 	
-	_formatSymbol: function(symbol) {
-	  var formattedExpression = this._blankFormattedExpression();
-	  formattedExpression.tex = '\\cssId{' + symbol.uniqueId + '}{' + symbol.symbol;
-	  formattedExpression.draggables.push({
+	symbolToTex: function(symbol) {
+    var tex = '';
+	  tex = '\\cssId{' + symbol.uniqueId + '}{' + symbol.symbol;
+		tex += '^{' + this.expressionPartToTex(symbol.superScript) + '}'
+		tex += '_{' + this.expressionPartToTex(symbol.subScript) + '}'
+		tex += '}'
+		
+	  this.draggablesToRender.push({
 		  id: symbol.uniqueId,
 		  draggable: { 
 			  object: symbol
 		  }
 		});
 		
-		var superScriptFE = this._formatExpressionPart(symbol.superScript);
-		formattedExpression.tex += '^{' + superScriptFE.tex + '}'
-		formattedExpression.draggables = formattedExpression.draggables.concat(superScriptFE.draggables);
-		formattedExpression.droppables = formattedExpression.droppables.concat(superScriptFE.droppables);
-		
-		var subScriptFE = this._formatExpressionPart(symbol.subScript);
-		formattedExpression.tex += '_{' + subScriptFE.tex + '}'
-		formattedExpression.draggables = formattedExpression.draggables.concat(subScriptFE.draggables);
-		formattedExpression.droppables = formattedExpression.droppables.concat(subScriptFE.droppables);
-		
-		formattedExpression.tex += '}'
-		
-	  return formattedExpression;
-	},
-	
-	_blankFormattedExpression: function() {
-		return { tex: '', draggables: [], droppables: [] };
+	  return tex;
 	},
 	
 	_removeDraggables: function() {
@@ -98,8 +83,8 @@ var ExpressionView = Class.create({
 		this.currentDraggables = [];
 	},
 	
-	_initializeDraggables: function(draggables) {
-	  draggables.each((function(options) {
+	_initializeDraggables: function() {
+	  this.draggablesToRender.each((function(options) {
   	  this.currentDraggables.push(
 	      new Draggable(options.id, {
 	      	revert: true
@@ -115,8 +100,8 @@ var ExpressionView = Class.create({
 		this.currentDroppableKeys = [];
 	},
 	
-	_initializeDroppables: function(droppables) {
-	  droppables.each((function(options) {
+	_initializeDroppables: function() {
+	  this.droppablesToRender.each((function(options) {
   	  this.currentDroppableKeys.push(options.id)
 	    Droppables.add(options.id, {
 		    hoverclass: 'droppable_hover',

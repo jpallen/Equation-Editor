@@ -11,6 +11,8 @@ var mainEventChain = [
   new BasicLogic()
 ]
 
+var expressionViewRenders = []
+
 var view = new ExpressionView();
 var controller = new ExpressionController();
 view.setController(controller);
