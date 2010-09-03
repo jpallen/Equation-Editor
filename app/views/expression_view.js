@@ -1,9 +1,9 @@
 var ExpressionView = Class.create({
 	initialize: function() {
-		this.renders = expressionViewRenders
+		this.renders = expressionViewRenders.collect((function(renderer) {
+		  return new renderer(this);	
+		}).bind(this));
 		this.container = new Element('div');
-		this.currentDraggables = [];
-		this.currentDroppableKeys = [];
 	},
 	
 	setController: function(controller) {
@@ -12,16 +12,26 @@ var ExpressionView = Class.create({
 	
 	/* Re-renders the expression using JsMath */
 	render: function() {
-		this.draggablesToRender = [];
-		this.droppablesToRender = [];
-		
+		this.callback('beforeExpressionToTex', this.controller.expression);
 		this.container.innerHTML = this.expressionPartToTex(this.controller.expression);
+		this.callback('afterExpressionToTex', this.controller.expression);
+		
 		this.container.addClassName('math');
-		this._removeDraggables();
-		this._removeDroppables();
+		
+		this.callback('beforeJsMathRender');
 		jsMath.ProcessElement(this.container);
-		jsMath.Synchronize(this._initializeDraggables.bind(this));
-		jsMath.Synchronize(this._initializeDroppables.bind(this));
+		this.callback('afterJsMathRender');
+	},
+	
+	callback: function() {
+		var args = Array.prototype.slice.call(arguments);
+		var name = args.reverse().pop();
+		args.reverse();
+		this.renders.each(function(renderer) {
+			if (renderer[name] != undefined) {
+			  renderer[name].apply(renderer, args)
+			}
+		});
 	},
 	
 	expressionPartToTex: function(expressionPart) {
@@ -36,84 +46,30 @@ var ExpressionView = Class.create({
 	expressionListToTex: function(expressionList) {
 	  var tex = '';
 	
-	  var counter = -1; // becomes 0 before first use	
-	  function addNextDroppableTo(view) {
-		  counter += 1;
-		  droppableId = expressionList.uniqueId + '_space_' + counter;
-		  view.droppablesToRender.push({
-			  id: droppableId,
-			  droppable: {
-				  object: expressionList,
-				  position: counter
-				}
-			});
-			return '\\cssId{' + droppableId + '}{.}';
-		}
-	
+	  var counter = 0;
+	  var spaceId = expressionList.uniqueId + '_space_' + counter;	
 	  expressionList.entries.each((function(expressionPart) {
-		  tex += addNextDroppableTo(this);
+		  tex += '\\cssId{' + spaceId + '}{.}';
 	    tex += this.expressionPartToTex(expressionPart);
+	    counter++;
+	    spaceId = expressionList.uniqueId + '_space_' + counter;
 		}).bind(this));
-	  tex += addNextDroppableTo(this);
+	  tex += '\\cssId{' + spaceId + '}{.}';
+		
+		this.callback('afterExpressionListToTex', expressionList);
 		
 		return tex;
 	},
 	
 	symbolToTex: function(symbol) {
     var tex = '';
-	  tex = '\\cssId{' + symbol.uniqueId + '}{' + symbol.symbol;
+	  tex = '\\cssId{' + symbol.uniqueId + '}{{' + symbol.symbol + '}';
 		tex += '^{' + this.expressionPartToTex(symbol.superScript) + '}'
 		tex += '_{' + this.expressionPartToTex(symbol.subScript) + '}'
 		tex += '}'
 		
-	  this.draggablesToRender.push({
-		  id: symbol.uniqueId,
-		  draggable: { 
-			  object: symbol
-		  }
-		});
+		this.callback('afterSymbolToTex', symbol);
 		
 	  return tex;
-	},
-	
-	_removeDraggables: function() {
-	  this.currentDraggables.each(function(draggable) {
-			draggable.destroy();
-		});
-		this.currentDraggables = [];
-	},
-	
-	_initializeDraggables: function() {
-	  this.draggablesToRender.each((function(options) {
-  	  this.currentDraggables.push(
-	      new Draggable(options.id, {
-	      	revert: true
-		    })
-	    );
-		}).bind(this));
-	},
-	
-	_removeDroppables: function() {
-	  this.currentDroppableKeys.each(function(key) {
-			Droppables.remove(key);
-		});
-		this.currentDroppableKeys = [];
-	},
-	
-	_initializeDroppables: function() {
-	  this.droppablesToRender.each((function(options) {
-  	  this.currentDroppableKeys.push(options.id)
-	    Droppables.add(options.id, {
-		    hoverclass: 'droppable_hover',
-		    onDrop: (function(draggableElement, droppableElement, event) {
-			    this.controller.onDrop(
-				    event,
-				    { object: idToObjectDictionary[draggableElement.id] }, 
-				    options.droppable
-			    )
-			  }).bind(this)
-	    });
-	    $(options.id).addClassName('droppable');
-		}).bind(this));
 	}
 });

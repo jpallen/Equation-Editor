@@ -8,10 +8,12 @@ function getUniqueId() {
 var idToObjectDictionary = {};
 
 var mainEventChain = [
-  new BasicLogic()
+  DragAndDropController
 ]
 
-var expressionViewRenders = []
+var expressionViewRenders = [
+  DragAndDropRenderer
+]
 
 var view = new ExpressionView();
 var controller = new ExpressionController();
@@ -22,7 +24,8 @@ var expression = new ExpressionList([
 	new Symbol('b'),
 	new Symbol('\\int'),
 	new Symbol('d\\phi'),
-	new Symbol('x')
+	new Symbol('x'),
+	new Symbol('f^{abc}{}_d')
 ]);
 controller.setExpression(expression);
 
