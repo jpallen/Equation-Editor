@@ -8,9 +8,10 @@ body {
 
 .droppable {
   color: white;
+  /* font-size: 10px; */
 }
 
-.droppable_hover {
+.droppable_hover, .droppable:hover {
   background-color: #def;
   color: #def;
   border: 1px dashed gray;

@@ -7,17 +7,35 @@ function getUniqueId() {
 
 var idToObjectDictionary = {};
 
+var modules = [
+	{
+		name: 'Clickables',
+		view: ClickablesRenderer
+	},
+  {
+	  name: 'Drag and Drop',
+	  view: DragAndDropRenderer,
+	  controller: DragAndDropController
+	},
+	{
+		name: 'Text Input',
+		view: TextInputRenderer,
+		controller: TextInputController
+	}
+]
+
 var mainEventChain = [
-  DragAndDropController
+  DragAndDropController,
+  TextInputController
 ]
 
 var expressionViewRenders = [
-  DragAndDropRenderer
+  ClickablesRenderer,
+  DragAndDropRenderer,
+  TextInputRenderer
 ]
 
-var view = new ExpressionView();
 var controller = new ExpressionController();
-view.setController(controller);
 
 var expression = new ExpressionList([
 	new Symbol('a'),
@@ -30,6 +48,6 @@ var expression = new ExpressionList([
 controller.setExpression(expression);
 
 document.observe('dom:loaded', function() {
-	document.body.insert(view.container);
-	view.render();
+	document.body.insert(controller.view.container);
+	controller.view.render();
 });

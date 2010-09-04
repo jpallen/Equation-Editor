@@ -1,8 +1,4 @@
-var DragAndDropController = Class.create({
-	initialize: function(controller) {
-		this.controller = controller;
-	},
-	
+var DragAndDropController = Class.create({	
 	/* 
 	 * _draggable_ and _droppable_ are hashes with an _object_ attribute which
 	 * is an instance of the symbol/expression they are part of. They may also
@@ -28,7 +24,7 @@ var DragAndDropController = Class.create({
 			droppedObject.removeFromParent();
       receivingObject.addEntry(droppedObject, position);
 
-      this.controller.renderRequired = true;
+      this.parentController.renderRequired = true;
 		}
 	}
 });

@@ -1,7 +1,27 @@
 var ExpressionController = Class.create({
 	initialize: function() {
-		this.eventChain = mainEventChain.collect((function(eventHandler) {
-		  return new eventHandler(this);
+		this.view = new ExpressionView();
+		this.view.controller = this;
+		this.subControllers = [];
+		modules.each((function(module) {
+			var renderer = null;
+			var controller = null
+			if (module.view != undefined) {
+			  renderer = new module.view;
+			  renderer.parentView = this.view;
+			  console.log(renderer.parentView);
+			  this.view.renderers.push(renderer);
+			}
+			if (module.controller != undefined) {
+			  controller = new module.controller;
+			  controller.parentController = this;
+			  this.subControllers.push(controller);
+			}
+			if (renderer != null && controller != null) {
+			  controller.view = renderer;
+			  renderer.controller = controller;	
+			}
+		  return controller;
 		}).bind(this));
 	},
 	
@@ -18,9 +38,9 @@ var ExpressionController = Class.create({
 		var args = Array.prototype.slice.call(arguments);
 		var name = args.reverse().pop();
 		args.reverse();
-		this.eventChain.each(function(eventHandler) {
-			if (eventHandler[name] != undefined) {
-			  eventHandler[name].apply(eventHandler, args)
+		this.subControllers.each(function(controller) {
+			if (controller[name] != undefined) {
+			  controller[name].apply(controller, args)
 			}
 		});
 		this.renderIfRequired();

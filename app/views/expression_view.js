@@ -1,9 +1,8 @@
 var ExpressionView = Class.create({
 	initialize: function() {
-		this.renders = expressionViewRenders.collect((function(renderer) {
-		  return new renderer(this);	
-		}).bind(this));
+		this.renderers = []; // Will be populated by the controller
 		this.container = new Element('div');
+		this.currentClickables = [];
 	},
 	
 	setController: function(controller) {
@@ -27,7 +26,7 @@ var ExpressionView = Class.create({
 		var args = Array.prototype.slice.call(arguments);
 		var name = args.reverse().pop();
 		args.reverse();
-		this.renders.each(function(renderer) {
+		this.renderers.each(function(renderer) {
 			if (renderer[name] != undefined) {
 			  renderer[name].apply(renderer, args)
 			}

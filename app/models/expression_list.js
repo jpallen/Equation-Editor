@@ -16,5 +16,9 @@ var ExpressionList = Class.create(ExpressionPart, {
 	addEntry: function(entry, position) {
 	  this.entries.splice(position, 0, entry);
 	  entry.parent = this;	
+	},
+	
+	idForPosition: function(position) {
+	  return this.uniqueId + '_space_' + position;	
 	}
 });

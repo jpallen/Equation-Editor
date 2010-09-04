@@ -1,6 +1,5 @@
 var DragAndDropRenderer = Class.create({
-	initialize: function(view) {
-		this.view = view;
+	initialize: function() {
 		this.currentDraggables = [];
 		this.currentDroppableKeys = [];
 	},
@@ -12,20 +11,18 @@ var DragAndDropRenderer = Class.create({
 	
 	afterExpressionListToTex: function(expressionList) {
 		var counter = 0;
-	  var spaceId = expressionList.uniqueId + '_space_' + counter;	
 	  expressionList.entries.each((function(expressionPart) {
 		  this.droppablesToRender.push({
-			  id: spaceId,
+			  id: expressionList.idForPosition(counter),
 			  droppable: {
 				  object: expressionList,
 				  position: counter
 				}
 			});
 	    counter++;
-	    spaceId = expressionList.uniqueId + '_space_' + counter;
 		}).bind(this));
 		this.droppablesToRender.push({
-		  id: spaceId,
+		  id: expressionList.idForPosition(counter),
 		  droppable: {
 			  object: expressionList,
 			  position: counter
@@ -82,7 +79,7 @@ var DragAndDropRenderer = Class.create({
 	    Droppables.add(options.id, {
 		    hoverclass: 'droppable_hover',
 		    onDrop: (function(draggableElement, droppableElement, event) {
-			    this.view.controller.callback(
+			    this.parentView.controller.callback(
 				    'onDrop',
 				    event,
 				    { object: idToObjectDictionary[draggableElement.id] }, 
